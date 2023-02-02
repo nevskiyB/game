@@ -60,8 +60,6 @@ public class KeyboardController implements InputProcessor {
         return false;
     }
 
-    // On touch we apply force from the direction of the users touch.
-    // This could result in the object "spinning"
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         //entity.getBody().applyForce(1f,1f,screenX,screenY,true);

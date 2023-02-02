@@ -91,6 +91,3 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 
 eclipse.project.name = appName + "-html"
 
-dependencies {
-    implementation group: 'log4j', name: 'log4j', version: '1.2.17'
-}

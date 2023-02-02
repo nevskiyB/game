@@ -3,10 +3,8 @@ package com.mygdx.battle.entity;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.mygdx.battle.Battle;
 import com.mygdx.battle.controller.Controllable;
 import com.mygdx.battle.physics.Physics;
-import org.apache.log4j.Logger;
 
 public class Character extends Entity implements Controllable {
     private Vector2 velocity;
