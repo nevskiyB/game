@@ -32,8 +32,4 @@ public class PhysicalBody {
     public float getY() {
         return body.getPosition().y;
     }
-
-    public Vector2 getPos() {
-        return body.getPosition();
-    }
 }
