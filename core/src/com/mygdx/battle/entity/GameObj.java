@@ -29,8 +29,14 @@ public class GameObj implements Disposable { //Статичное жёсткое
         poly.setAsBox(width/2, height/2, new Vector2(width/2, height/2), 0f);
         mainBody = Physics.world.createBody(mainBodyDef);
         mainBody.setType(BodyDef.BodyType.StaticBody);
+        MassData massData = new MassData();
+        massData.center.set(width/2, height/2);
+        mainBody.setMassData(massData);
+        mainBody.resetMassData();
         mainFixture = mainBody.createFixture(poly, 100f);
         mainFixture.setFriction(1f);
+
+        RenderMng.objects.add(this);
 
         poly.dispose();
     }
