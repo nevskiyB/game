@@ -5,13 +5,18 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.battle.controller.Controllable;
+import com.mygdx.battle.physics.CategoryBits;
 import com.mygdx.battle.physics.Physics;
+import com.mygdx.battle.weapon.Weapon;
+import com.mygdx.battle.weapon.spitter.Spitter;
 
 public class Character extends GameObj implements Controllable {
     private OrthographicCamera camera = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
     private Vector2 velocity;
-    private boolean isGrounded;
+    private Vector2 convertedMousePos = new Vector2();//Конвертированная позиция мыши относительно центра игрока
+    private Vector2 cameraOffset;
     //Box2DDebugRenderer renderer = new Box2DDebugRenderer();
     public Character(Sprite sprite, Vector2 velocity, Vector2 startPos) {
         super(sprite, startPos);
@@ -20,25 +25,13 @@ public class Character extends GameObj implements Controllable {
         camera.zoom = 0.3f;
         mainBody.setType(BodyDef.BodyType.DynamicBody);
         mainBody.setFixedRotation(true);
-        Physics.world.setContactListener(new ContactListener() {
-            @Override
-            public void beginContact(Contact contact) {
-                isGrounded = true;
-            }
+        cameraOffset = new Vector2(Gdx.graphics.getWidth()/2 + sprite.getWidth()/2/camera.zoom,
+                Gdx.graphics.getHeight()/2 - (sprite.getHeight() + 20)/2/camera.zoom);
 
-            @Override
-            public void endContact(Contact contact) {
-                isGrounded = false;
-            }
-
-            @Override
-            public void preSolve(Contact contact, Manifold oldManifold) {
-            }
-
-            @Override
-            public void postSolve(Contact contact, ContactImpulse impulse) {
-            }
-        });
+        Filter fixtureFilter = new Filter();
+        fixtureFilter.categoryBits = CategoryBits.chars;
+        fixtureFilter.maskBits = CategoryBits.chars | CategoryBits.scene;
+        mainFixture.setFilterData(fixtureFilter);
     }
 
     @Override
@@ -52,22 +45,48 @@ public class Character extends GameObj implements Controllable {
 
     @Override
     public void moveRight() {
-        if(isGrounded) {
+        if(isGrounded()) {
             mainBody.setLinearVelocity(velocity.x, mainBody.getLinearVelocity().y);
         }
     }
 
     @Override
     public void moveLeft() {
-        if(isGrounded) {
+        if(isGrounded()) {
             mainBody.setLinearVelocity(-velocity.x, mainBody.getLinearVelocity().y);//на земле
         }
     }
 
     @Override
     public void up() {
-        if(isGrounded) {
+        if(isGrounded()) {
             mainBody.setLinearVelocity(mainBody.getLinearVelocity().x, velocity.y);
         }
+    }
+
+    @Override
+    public void rotateTo(int mouseX, int mouseY) {
+        convertedMousePos.set(mouseX - cameraOffset.x, -(mouseY - cameraOffset.y));
+    }
+
+    @Override
+    public void attack() {
+        Weapon weapon = new Spitter(
+                new Vector2(mainBody.getPosition().x + sprite.getWidth()/2, mainBody.getPosition().y + sprite.getHeight()/1.6f),
+                14f,
+                300f);
+        weapon.attack(convertedMousePos);
+    }
+
+    private boolean isGrounded() {
+        Array<Contact> contacts = Physics.world.getContactList();
+
+        for(Contact contact : contacts) {
+            if(contact.getFixtureA() == this.mainFixture || contact.getFixtureB() == this.mainFixture) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

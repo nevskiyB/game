@@ -4,10 +4,7 @@ package com.mygdx.battle.entity;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Disposable;
 import com.mygdx.battle.Battle;
 import com.mygdx.battle.physics.Physics;
@@ -32,8 +29,14 @@ public class GameObj implements Disposable { //Статичное жёсткое
         poly.setAsBox(width/2, height/2, new Vector2(width/2, height/2), 0f);
         mainBody = Physics.world.createBody(mainBodyDef);
         mainBody.setType(BodyDef.BodyType.StaticBody);
+        MassData massData = new MassData();
+        massData.center.set(width/2, height/2);
+        mainBody.setMassData(massData);
+        mainBody.resetMassData();
         mainFixture = mainBody.createFixture(poly, 100f);
         mainFixture.setFriction(1f);
+
+        RenderMng.objects.add(this);
 
         poly.dispose();
     }
