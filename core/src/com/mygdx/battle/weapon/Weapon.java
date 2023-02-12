@@ -3,13 +3,12 @@ package com.mygdx.battle.weapon;
 import com.badlogic.gdx.math.Vector2;
 
 public abstract class Weapon {
-    protected float projectileVelocity = 10f;
+    protected float velocity;
     protected float projectileAmount = -1;
-    protected int damage = 10;
     public WeaponType weaponType = WeaponType.unarmed;
 
-    public Weapon() {
-
+    public Weapon(float velocity) {
+        this.velocity = velocity;
     }
 
     public enum WeaponType {

@@ -7,16 +7,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.battle.controller.Controllable;
+import com.mygdx.battle.physics.CategoryBits;
 import com.mygdx.battle.physics.Physics;
-import com.mygdx.battle.render.RenderMng;
 import com.mygdx.battle.weapon.Weapon;
 import com.mygdx.battle.weapon.spitter.Spitter;
 
 public class Character extends GameObj implements Controllable {
     private OrthographicCamera camera = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
     private Vector2 velocity;
-    private Vector2 angle = new Vector2();
-    private Vector2 convertedMousePos = new Vector2();//Конвертированная позиция мыши относительно цента игрока
+    private Vector2 convertedMousePos = new Vector2();//Конвертированная позиция мыши относительно центра игрока
     private Vector2 cameraOffset;
     //Box2DDebugRenderer renderer = new Box2DDebugRenderer();
     public Character(Sprite sprite, Vector2 velocity, Vector2 startPos) {
@@ -29,10 +28,10 @@ public class Character extends GameObj implements Controllable {
         cameraOffset = new Vector2(Gdx.graphics.getWidth()/2 + sprite.getWidth()/2/camera.zoom,
                 Gdx.graphics.getHeight()/2 - (sprite.getHeight() + 20)/2/camera.zoom);
 
-//        Filter fixtureFilter = new Filter();
-//        fixtureFilter.categoryBits = 0x0001;
-//        fixtureFilter.maskBits = 0x0002;
-//        mainFixture.setFilterData(fixtureFilter);
+        Filter fixtureFilter = new Filter();
+        fixtureFilter.categoryBits = CategoryBits.chars;
+        fixtureFilter.maskBits = CategoryBits.chars | CategoryBits.scene;
+        mainFixture.setFilterData(fixtureFilter);
     }
 
     @Override
@@ -67,16 +66,15 @@ public class Character extends GameObj implements Controllable {
 
     @Override
     public void rotateTo(int mouseX, int mouseY) {
-        convertedMousePos.set(mouseX - cameraOffset.x, mouseY - cameraOffset.y);
-        //float angle = convertedMousePos.angleDeg();
-        //RenderMng.msg = "Mouse X:" + String.valueOf(convertedMousePos.x + " Y:" + String.valueOf(convertedMousePos.y)) +
-        //"\nAngle: " + angle;
-        //angle.set(mousePos);
+        convertedMousePos.set(mouseX - cameraOffset.x, -(mouseY - cameraOffset.y));
     }
 
     @Override
     public void attack() {
-        Weapon weapon = new Spitter(new Vector2(mainBody.getPosition().x, mainBody.getPosition().y + 38));
+        Weapon weapon = new Spitter(
+                new Vector2(mainBody.getPosition().x + sprite.getWidth()/2, mainBody.getPosition().y + sprite.getHeight()/1.6f),
+                14f,
+                300f);
         weapon.attack(convertedMousePos);
     }
 
